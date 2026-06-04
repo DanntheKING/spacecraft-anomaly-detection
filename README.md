@@ -13,7 +13,6 @@ End-to-end machine learning and MLOps platform for detecting anomalous spacecraf
 
 ## Architecture
 
-![Architecture](images/architecture.png)
 
 ```text
 NASA Telemetry Dataset
