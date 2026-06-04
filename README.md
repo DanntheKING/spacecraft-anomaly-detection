@@ -1,10 +1,51 @@
 # Spacecraft Telemetry Anomaly Detection Platform
 
-## Overview
+End-to-end machine learning and MLOps platform for detecting anomalous spacecraft telemetry using NASA SMAP/MSL mission data and Azure Machine Learning.
 
-This project demonstrates an end-to-end machine learning and MLOps workflow for detecting anomalous spacecraft telemetry using the NASA SMAP/MSL telemetry dataset.
+## Project Highlights
 
-The objective is to identify abnormal spacecraft behavior from high-dimensional telemetry streams before mission-impacting failures occur. The project combines machine learning experimentation, anomaly detection techniques, experiment tracking, and Azure Machine Learning infrastructure to simulate a production-grade aerospace analytics solution.
+* Built an anomaly detection pipeline using NASA spacecraft telemetry data.
+* Trained and evaluated Isolation Forest models on multivariate telemetry streams.
+* Leveraged Azure Machine Learning managed compute for cloud-based model training.
+* Tracked experiments and metrics using MLflow.
+* Registered trained models in Azure Machine Learning Model Registry.
+* Implemented a production-oriented MLOps workflow from training through model management.
+
+## Architecture
+
+![Architecture](images/architecture.png)
+
+```text
+NASA Telemetry Dataset
+          ↓
+Data Preprocessing
+          ↓
+Feature Scaling
+          ↓
+Isolation Forest Training
+          ↓
+Azure ML Training Job
+          ↓
+MLflow Experiment Tracking
+          ↓
+Azure Model Registry
+```
+
+---
+
+## Azure Machine Learning Workflow
+
+### Azure Training Job
+
+![Azure Job](images/azure_training_job.png)
+
+### Experiment Metrics
+
+![Metrics](images/experiment_metrics.png)
+
+### Model Registry
+
+![Model Registry](images/model_registry.png)
 
 ---
 
@@ -12,9 +53,7 @@ The objective is to identify abnormal spacecraft behavior from high-dimensional 
 
 Modern spacecraft generate thousands of telemetry measurements that engineers must continuously monitor to identify abnormal behavior.
 
-Traditional rule-based monitoring systems can struggle to detect novel failure modes and complex telemetry patterns.
-
-This project explores the use of unsupervised machine learning to automatically identify anomalous telemetry behavior and provide early warning indicators that could support mission operations and maintenance teams.
+This project investigates whether unsupervised machine learning can identify abnormal spacecraft behavior before mission-impacting failures occur.
 
 ---
 
@@ -24,17 +63,10 @@ This project explores the use of unsupervised machine learning to automatically 
 
 The dataset contains telemetry channels collected from:
 
-* SMAP (Soil Moisture Active Passive Satellite)
-* MSL (Mars Science Laboratory Rover)
+* Soil Moisture Active Passive (SMAP) Satellite
+* Mars Science Laboratory (MSL) Rover
 
-Each telemetry channel includes:
-
-* Historical training telemetry
-* Test telemetry containing anomalies
-* Ground-truth anomaly ranges
-* Anomaly classifications
-
-Example telemetry channel:
+Example channel:
 
 ```text
 P-1
@@ -44,58 +76,33 @@ Test Shape: (8505, 25)
 
 ---
 
-# Machine Learning Layer
+## Machine Learning Approach
 
-## Problem Formulation
+### Feature Engineering
 
-This project treats anomaly detection as an unsupervised learning problem.
+* StandardScaler normalization
+* Multivariate telemetry processing
+* Ground-truth anomaly range generation
 
-Training data is assumed to represent primarily normal spacecraft behavior while test data contains both normal and anomalous observations.
+### Model
 
-The objective is to identify anomalous telemetry patterns without requiring labeled anomaly examples during training.
+Isolation Forest was selected because it:
 
----
-
-## Feature Engineering
-
-The telemetry data consists of:
-
-* 25 telemetry features
-* Thousands of sequential observations
-* Multiple spacecraft subsystems
-
-Features are standardized using:
-
-```python
-StandardScaler
-```
-
-to normalize sensor measurements before model training.
+* Requires no anomaly labels during training
+* Scales efficiently to large telemetry datasets
+* Performs well on high-dimensional sensor data
 
 ---
 
-## Model
+## Experiment Results
 
-### Isolation Forest
+| Metric    | Score |
+| --------- | ----- |
+| Precision | 0.092 |
+| Recall    | 0.161 |
+| F1 Score  | 0.117 |
 
-The baseline anomaly detection model uses:
-
-```python
-IsolationForest
-```
-
-Isolation Forest is commonly used in industrial anomaly detection systems because it:
-
-* Does not require labeled training anomalies
-* Scales efficiently
-* Works well with high-dimensional telemetry
-* Provides interpretable anomaly scoring
-
----
-
-## Experimentation
-
-Multiple contamination thresholds were evaluated:
+### Hyperparameter Experiments
 
 | Contamination |
 | ------------- |
@@ -105,107 +112,34 @@ Multiple contamination thresholds were evaluated:
 | 0.10          |
 | 0.15          |
 
-Model performance was evaluated using:
-
-* Precision
-* Recall
-* F1 Score
-
-Experiments were tracked using MLflow.
+Experiments were tracked using MLflow and Azure Machine Learning.
 
 ---
 
-## Results
+## Azure MLOps Components
 
-Current baseline results:
+### Infrastructure
 
-| Metric    | Score |
-| --------- | ----- |
-| Precision | 0.092 |
-| Recall    | 0.161 |
-| F1 Score  | 0.117 |
+* Azure Resource Group
+* Azure Machine Learning Workspace
+* Azure Compute Cluster
+* Azure ML Model Registry
 
-These results establish a baseline for future improvements including:
-
-* Autoencoders
-* LSTM-based anomaly detection
-* Deep learning sequence models
-* Hyperparameter optimization
-
----
-
-# Cloud & MLOps Layer
-
-## Azure Machine Learning
-
-To simulate a production-grade machine learning environment, the project leverages Azure Machine Learning services.
-
-Infrastructure created:
-
-### Azure Resource Group
-
-```text
-rg-spacecraft-ml
-```
-
-### Azure Machine Learning Workspace
-
-```text
-spacecraft-ml-ws
-```
-
-### Azure Compute Cluster
-
-```text
-cpu-cluster
-```
-
-Configured with:
-
-* Auto-scaling enabled
-* Minimum nodes = 0
-* Cost-optimized compute management
-
----
-
-## Experiment Tracking
-
-Experiments are tracked using MLflow.
+### Experiment Tracking
 
 Tracked metadata includes:
 
-* Model type
 * Hyperparameters
 * Precision
 * Recall
 * F1 Score
 * Training configuration
 
-This enables reproducible experimentation and model comparison.
+### Model Management
 
----
-
-## Production-Oriented Workflow
-
-The project follows a modern MLOps workflow:
-
-```text
-Telemetry Data
-      ↓
-Data Preprocessing
-      ↓
-Feature Scaling
-      ↓
-Isolation Forest Training
-      ↓
-MLflow Experiment Tracking
-      ↓
-Azure Machine Learning Compute
-      ↓
-Model Registry
-      ↓
-Online Endpoint Deployment
-```
+* Registered trained models in Azure ML Model Registry
+* Managed model artifacts and versions
+* Established foundation for deployment workflows
 
 ---
 
@@ -223,41 +157,36 @@ Online Endpoint Deployment
 ### Cloud & MLOps
 
 * Azure Machine Learning
-* Azure Compute Clusters
-* Azure Resource Groups
-* Azure ML Workspaces
+* Azure ML Compute Clusters
+* Azure ML Model Registry
 * MLflow Tracking
 
 ### Development
 
-* Jupyter Notebook
 * Git
 * GitHub
+* Jupyter Notebook
 
 ---
 
-## Future Improvements
+## Future Enhancements
 
-Planned enhancements include:
-
-* Azure ML Training Jobs
-* Azure Model Registry
-* Managed Online Endpoints
-* CI/CD Integration
-* Automated Retraining Pipelines
-* Deep Learning-Based Anomaly Detection
-* Real-Time Telemetry Streaming
+* Autoencoder-based anomaly detection
+* LSTM sequence modeling
+* Hyperparameter optimization
+* CI/CD pipelines
+* Automated retraining workflows
+* Real-time telemetry streaming
 
 ---
 
-## Key Takeaways
+## Resume-Relevant Skills Demonstrated
 
-This project demonstrates both machine learning engineering and cloud MLOps capabilities:
-
-* Building anomaly detection models for aerospace telemetry
-* Experiment tracking and model evaluation
-* Azure Machine Learning infrastructure deployment
-* Cloud-based model training workflows
-* Production-oriented machine learning architecture
-
-The goal is not only to build an accurate anomaly detector, but to demonstrate the full lifecycle of deploying machine learning systems in a scalable, enterprise-ready environment.
+* Machine Learning Engineering
+* MLOps
+* Azure Machine Learning
+* Experiment Tracking
+* Model Registry
+* Cloud-Based Training
+* Data Engineering
+* Aerospace Analytics
