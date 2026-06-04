@@ -1,0 +1,19 @@
+$schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
+
+code: ..
+
+command: >-
+  python src/train.py
+  --data_dir Data/raw/data
+  --channel_id P-1
+  --contamination 0.15
+  --model_dir outputs
+
+environment:
+  conda_file: environment.yml
+  image: mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu20.04
+
+compute: azureml:cpu-cluster
+
+experiment_name: spacecraft-anomaly-detection
+display_name: isolation-forest-p1
